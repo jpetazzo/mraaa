@@ -22,6 +22,7 @@
       .red { color: #fa0000; }
       .gray { color: #ccc; }
       .small { font-size: 70%; }
+      .underline { text-decoration: underline; }
       .footnote {
         position: absolute;
         bottom: 3em;
@@ -294,7 +295,7 @@ WIN $$$ (And performance, too, because of caching)
 
 # Modern copy-on-write on your desktop
 
-(In no specific order; non exhaustive list)
+(In no specific order; non-exhaustive list)
 
 - LVM (Logical Volume Manager) on Linux
 
@@ -573,7 +574,7 @@ b39b81afc8ca
 
 - When starting 1000x the same container, the data is loaded
   only once from disk, and cached only once in memory
-  (but dentries will be duplicated)
+  (but `dentries` will be duplicated)
 
 ---
 
@@ -589,7 +590,7 @@ class: center, middle
 
   - RAID
 
-  - crypted devices
+  - encrypted devices
 
   - snapshots (i.e. copy-on-write)
 
@@ -887,7 +888,9 @@ What with the grayed .gray[fs]?
 
   - `dpkg -i` that file, reboot, enjoy
 
-.footnote[.red[¹] Yes, I do shameless positive discrimination for Ubuntu. Sorry!]
+.footnote[.red[¹]
+Adapatation to other distros left as an exercise for the reader.
+]
 
 ---
 
@@ -941,40 +944,136 @@ class: center, middle
 
 - Doesn't rely on those fancy-pesky kernel features
 
-- Good candidate when porting
+- Good candidate when porting Docker to new platforms
+  <br/>(think FreeBSD, Solaris...)
 
+- Space .underline[in]efficient, slow
+
+---
 
 # In practice
-# Under the hood
-# Example
-# Performance, tuning
+
+- Might be useful for production setups
+
+  (If you don't want / cannot use volumes, and don't want / cannot
+  use any of the copy-on-write mechanisms!)
 
 ---
 
 class: center, middle
 
-- Conclusions
+# Conclusions
 
 ---
 
 class: center, middle
 
-# discard
+*The nice thing about Docker storage drivers,
+<br/>is that there are so many of them to choose from.*
 
-# `devicemapper`
+---
 
-# `overlay`
+# What do, what do?
 
-module name change in 3.18
+- If you do PaaS or other high-density environment:
 
+  - AUFS (if available on your kernel)
 
+  - overlayfs (otherwise)
 
+- If you put big writable files on the CoW filesystem:
 
-http://kernel.ubuntu.com/~kernel-ppa/mainline/v3.18.3-vivid/
+  - BTRFS or Device Mapper (pick the one you know best)
 
+  - *Wait, really, you want me to pick one!?!*
 
+---
 
-michael.lipschutz Hi Jerome, could you put a slide at the end of your presentation that tells people we're hiring  for infrastructure, QA, Python & Go engineers and to email resumes to jobs@docker.com 
+class: center, middle
+
+# Bottom line
+
+---
+
+class: center, middle
+
+*The best storage driver to run your production
+<br/>will be the one with which you and your team
+<br/>have the most extensive operational experience.*
+
+---
+
+class: center, middle
+
+# Bonus track
+
+## `discard` and `TRIM`
+
+---
+
+# `TRIM`
+
+- Command sent to a SSD disk, to tell it:
+  <br/>*"that block is not in use anymore"*
+
+- Useful because on SSD, *erase* is very expensive (slow)
+
+- Allows the SSD to pre-erase cells in advance
+  <br/>(rather than on-the-fly, just before a *write*)
+
+- Also meaningful on copy-on-write storage
+  <br/>(if/when every snapshots as trimmed a block, it can be freed)
+
+---
+
+# `discard`
+
+- Filesystem option meaning:
+  <br/>*"can I has `TRIM` on this pls"*
+
+- Can be enabled/disabled at any time
+
+- Filesystem can also be trimmed manually with `fstrim`
+  <br/>(even while mounted)
+
+---
+
+# The `discard` quandary
+
+- `discard` works on Device Mapper + loopback devices
+
+- ... but is particularly slow on loopback devices
+  <br/>(the loopback file needs to be "re-sparsified"
+  after container or image deletion, and this is a slow
+  operation)
+
+- You can turn it on or off depending on your preference
+
+---
+
+class: center, middle
+
+# That's all folks!
+
+---
+
+# Questions?
+
+- To get those slides, follow me on twitter: [@jpetazzo](https://twitter.com/jpetazzo)
+  <br/>.small[Yes, this is a particularly evil scheme to increase my follower count]
+
+- Also .red[WE ARE HIRING!]
+
+  - infrastructure (servers, metal, and stuff)
+
+  - QA (get paid to break things!)
+
+  - Python (Docker Hub and more)
+
+  - Go (Docker Engine and more)
+
+- Send your resume to jobs@docker.com 
+  <br/>.gray[Do it do it do it NOW NOW!]
 
     </textarea>
     <script src="http://gnab.github.io/remark/downloads/remark-0.5.9.min.js" type="text/javascript">

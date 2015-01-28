@@ -311,13 +311,13 @@ WIN $$$ (And performance, too, because of caching)
 
 # Copy-on-write and Docker: a love story
 
-- Without copy-on-write:
+- Without copy-on-write...
 
   - it would take forever to start a container
 
   - containers would use up a lot of space
 
-- Without copy-on-write "on your desktop":
+- Without copy-on-write "on your desktop"...
 
   - Docker would not be usable on your Linux machine
 
@@ -385,7 +385,7 @@ class: center, middle
 
 - As it happens, we also .red[♥] Debian and Ubuntu very much
 
-- First version of Docker is targetted at Ubuntu (and Debian)
+- First version of Docker is targeted at Ubuntu (and Debian)
 
 ---
 
@@ -572,7 +572,7 @@ b39b81afc8ca
 - Protip: when we built dotCloud, we ended up putting
   all important data on *volumes*
 
-- When starting 1000x the same container, the data is loaded
+- When starting the same container 1000x, the data is loaded
   only once from disk, and cached only once in memory
   (but `dentries` will be duplicated)
 
